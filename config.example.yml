@@ -1,0 +1,29 @@
+# CrowdSec to AbuseIPDB Reporter Configuration
+# Copy this to config.yml and edit with your actual API keys
+
+# CrowdSec Configuration
+crowdsec:
+  url: "http://localhost:8080"
+  api_key: "YOUR_CROWDSEC_API_KEY_HERE"  # Bouncer API key (fallback)
+  # Machine credentials file will be auto-detected at ./local_api_credentials.yaml
+
+# AbuseIPDB Configuration  
+abuseipdb:
+  api_key: "YOUR_ABUSEIPDB_API_KEY_HERE"
+
+# Operational Settings
+settings:
+  poll_interval: 300        # Seconds between polls (300 = 5 minutes)
+  hours_back: 24           # How far back to look for alerts (hours)
+  daemon_mode: true        # Run continuously (true) or once (false)
+  abuseipdb_throttle: 10   # Seconds between AbuseIPDB reports
+
+# Logging Configuration
+logging:
+  level: "INFO"            # DEBUG, INFO, WARNING, ERROR
+  file: "crowdsec_reporter.log"
+
+# Persistence Configuration
+persistence:
+  database_file: "crowdsec_reports.db"  # SQLite database file for reports and history
+  history_retention_days: 30            # How long to keep history (days)
