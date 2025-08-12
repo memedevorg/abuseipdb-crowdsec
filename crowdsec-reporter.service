@@ -1,0 +1,51 @@
+[Unit]
+Description=CrowdSec to AbuseIPDB Reporter
+Documentation=https://github.com/memedevorg/abuseipdb-crowdsec
+After=network.target crowdsec.service
+Wants=network.target
+StartLimitIntervalSec=0
+
+[Service]
+Type=simple
+User=crowdsec-reporter
+Group=crowdsec-reporter
+WorkingDirectory=/opt/crowdsec-reporter
+ExecStart=/usr/bin/python3 /opt/crowdsec-reporter/crowdsec_reporter.py
+ExecReload=/bin/kill -HUP $MAINPID
+Restart=always
+RestartSec=30
+StandardOutput=journal
+StandardError=journal
+SyslogIdentifier=crowdsec-reporter
+
+# Security settings
+NoNewPrivileges=true
+PrivateTmp=true
+ProtectSystem=strict
+ProtectHome=true
+ReadWritePaths=/opt/crowdsec-reporter
+CapabilityBoundingSet=
+AmbientCapabilities=
+SystemCallFilter=@system-service
+SystemCallErrorNumber=EPERM
+RestrictRealtime=true
+RestrictSUIDSGID=true
+LockPersonality=true
+MemoryDenyWriteExecute=true
+RestrictNamespaces=true
+ProtectKernelTunables=true
+ProtectKernelModules=true
+ProtectKernelLogs=true
+ProtectControlGroups=true
+ProtectClock=true
+ProtectHostname=true
+
+# Resource limits
+MemoryMax=512M
+TasksMax=20
+
+# Environment
+Environment="PYTHONUNBUFFERED=1"
+
+[Install]
+WantedBy=multi-user.target
