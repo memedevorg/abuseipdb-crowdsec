@@ -314,17 +314,19 @@ class CrowdSecClient:
 
     def _parse_stream(self, data: dict) -> list[Alert]:
         alerts = []
-        capi_skipped = 0
+        skipped = 0
         for decision in data.get("new") or []:
-            if decision.get("origin", "").upper() == "CAPI":
-                capi_skipped += 1
+            origin = decision.get("origin", "").lower()
+            scenario = decision.get("scenario", "")
+            # Only process local detections (origin: crowdsec), skip CAPI/lists
+            if origin != "crowdsec" or self._is_system_scenario(scenario):
+                skipped += 1
                 continue
             if decision.get("scope", "").lower() == "ip":
                 ip = decision.get("value")
-                scenario = decision.get("scenario", "unknown")
                 if ip:
                     alerts.append(Alert(ip=ip, scenario=self._normalize_scenario(scenario)))
-        self.logger.info(f"Stream endpoint: {len(alerts)} local, {capi_skipped} CAPI skipped")
+        self.logger.info(f"Stream endpoint: {len(alerts)} local, {skipped} community/lists skipped")
         return alerts
 
     @staticmethod
