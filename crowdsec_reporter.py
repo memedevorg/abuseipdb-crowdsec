@@ -625,7 +625,16 @@ class CrowdSecClient:
     def _get_alerts_from_stream_endpoint(self, cutoff_time: datetime) -> List[Alert]:
         """Get recent decisions using stream endpoint with bouncer auth"""
         try:
-            response = self._make_authenticated_request('/v1/decisions/stream?startup=true')
+            if not self.api_key:
+                logger.warning("No bouncer API key configured for stream endpoint")
+                return []
+            
+            headers = {
+                'X-Api-Key': self.api_key,
+                'Content-Type': 'application/json',
+                'User-Agent': 'CrowdSec-AbuseIPDB-Reporter/1.0'
+            }
+            response = requests.get(f"{self.api_url}/v1/decisions/stream?startup=true", headers=headers)
             response.raise_for_status()
             
             stream_data = response.json()
